@@ -51,8 +51,7 @@ class RFPDupeFilter(BaseDupeFilter):
         if fp in self.fingerprints:
             return True
         if request.method == "HEAD":
-            request_get = request.deepcopy()
-            request_get.method = "GET"
+            request_get = request.copy(method="GET")
             fp_get = self.request_fingerprint(request_get)
             if fp_get in self.fingerprints:
                 return True
