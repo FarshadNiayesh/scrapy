@@ -45,9 +45,17 @@ class RFPDupeFilter(BaseDupeFilter):
         return cls(job_dir(settings), debug)
 
     def request_seen(self, request):
+        """ Check if this request has already been seen. Edited to Check
+        whether there already was a GET request before (in case of HEAD) """
         fp = self.request_fingerprint(request)
         if fp in self.fingerprints:
             return True
+        if request.method == "HEAD":
+            request_get = request.deepcopy()
+            request_get.method = "GET"
+            fp_get = self.request_fingerprint(request_get)
+            if fp_get in self.fingerprints:
+                return True
         self.fingerprints.add(fp)
         if self.file:
             self.file.write(fp + os.linesep)
